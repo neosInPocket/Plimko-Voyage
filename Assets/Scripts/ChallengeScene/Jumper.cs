@@ -13,13 +13,21 @@ public class Jumper : MonoBehaviour
 	[SerializeField] public SpriteRenderer spriteRenderer;
 	[SerializeField] public new CircleCollider2D collider;
 	[SerializeField] public float maxShrink;
-	[SerializeField] public float shrinkSpeed;
+	[SerializeField] public float[] shrinkSpeeds;
+	[SerializeField] public GameObject pass;
+	[SerializeField] public GameObject explode;
+	[SerializeField] public ZonesApplicator zonesApplicator;
+	[SerializeField] public DangerFloor dangerFloor;
+	[SerializeField] public Challenger challenger;
 	public FractionType fractionSelected { get; private set; } = FractionType.Middle;
+	private float shrinkForce;
+	private float shrinkSpeed;
 
 	private void Start()
 	{
-
+		shrinkSpeed = shrinkSpeeds[ChallengesHolder.Challenges.ringUpgrade];
 	}
+
 
 	public void Avaliable(bool value)
 	{
@@ -30,6 +38,7 @@ public class Jumper : MonoBehaviour
 		else
 		{
 			Touch.onFingerDown -= SelectFraction;
+			Touch.onFingerUp -= EndBounce;
 		}
 	}
 
@@ -60,30 +69,33 @@ public class Jumper : MonoBehaviour
 
 		if (fractionSelected == fractionType)
 		{
-
+			jumperRigid.constraints = RigidbodyConstraints2D.FreezeAll;
+			collider.enabled = false;
+			StartCoroutine(ShrinkBall());
+			Touch.onFingerDown -= SelectFraction;
+			Touch.onFingerUp += EndBounce;
 		}
 		else
 		{
 			fractionSelected = fractionType;
 			transform.DOMoveX(jumperNextPosition.x, selectTime);
 		}
-
-	}
-
-	public void StartBounce()
-	{
-		Touch.onFingerUp += EndBounce;
 	}
 
 	public void EndBounce(Finger finger)
 	{
+		StopAllCoroutines();
 		Touch.onFingerUp -= EndBounce;
-		jumperRigid.AddForce(jumpForce * Vector2.up, ForceMode2D.Impulse);
+		transform.localScale = Vector3.one;
+		collider.enabled = true;
+		jumperRigid.constraints = RigidbodyConstraints2D.None;
+		jumperRigid.AddForce(shrinkForce * jumpForce * Vector2.up, ForceMode2D.Impulse);
+		StartCoroutine(WaitForZeroSpeed());
 	}
 
 	public IEnumerator ShrinkBall()
 	{
-		float shrinkForce = 0;
+		shrinkForce = 0;
 		Vector3 scale = Vector3.one;
 
 		while (shrinkForce < maxShrink)
@@ -93,8 +105,6 @@ public class Jumper : MonoBehaviour
 			transform.localScale = scale;
 			yield return null;
 		}
-
-
 	}
 
 	public IEnumerator WaitForZeroSpeed()
@@ -104,22 +114,58 @@ public class Jumper : MonoBehaviour
 			yield return null;
 		}
 
-		RaycastHit2D[] raycasthit = Physics2D.RaycastAll(transform.position, Vector3.forward);
-		var JumpZone = raycasthit.FirstOrDefault(x => x.collider.GetComponent<JumpZone>() != null);
+		RaycastHit2D[] raycasthit = Physics2D.RaycastAll(transform.position + new Vector3(0, spriteRenderer.size.y / 2, 0), Vector3.forward);
+		var JumpZone = raycasthit.FirstOrDefault(x => x.collider.name == "Zone");
 
 		if (JumpZone.collider != null)
 		{
-			Debug.Log("zone is not null");
+			JumpZone zone = JumpZone.collider.transform.parent.parent.GetComponent<JumpZone>();
+			zone.PassZone(this);
+			StopCoroutine(Pass());
+			StartCoroutine(Pass());
+			Touch.onFingerDown += SelectFraction;
+			zonesApplicator.SpawnNext();
+			dangerFloor.SetFloorNextLayer();
+			challenger.IncrementScore();
 		}
 		else
 		{
-			Debug.Log("zone is null");
+			StartCoroutine(Explode());
+			Avaliable(false);
+			challenger.CrashComet();
 		}
+	}
+
+	public IEnumerator Pass()
+	{
+		var decoy = Instantiate(pass, transform.position, Quaternion.identity, transform);
+		yield return new WaitForSeconds(1f);
+		Destroy(decoy.gameObject);
+	}
+
+	public void OnTriggerEnter2D(Collider2D collider)
+	{
+		if (collider.TryGetComponent<DangerFloor>(out DangerFloor dangerFloor))
+		{
+			challenger.CrashComet();
+			StartCoroutine(Explode());
+		}
+	}
+
+	public IEnumerator Explode()
+	{
+		spriteRenderer.enabled = false;
+		jumperRigid.constraints = RigidbodyConstraints2D.FreezeAll;
+		collider.enabled = false;
+		explode.SetActive(true);
+		yield return new WaitForSeconds(1f);
+		explode.SetActive(false);
 	}
 
 	public void OnDisable()
 	{
 		Touch.onFingerDown -= SelectFraction;
 		Touch.onFingerUp -= EndBounce;
+		StopAllCoroutines();
 	}
 }

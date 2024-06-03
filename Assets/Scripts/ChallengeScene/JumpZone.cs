@@ -11,30 +11,36 @@ public class JumpZone : MonoBehaviour
 	[SerializeField] public ParticleSystem zoneRight;
 	[SerializeField] public Color selectColor;
 	[SerializeField] public Color selectColorParticles;
+	[SerializeField] public Collider2D breakCollider;
+	[SerializeField] public float[] zoneHeights;
+
 	public FractionType fractionType;
 
 	private void Start()
 	{
 		PrepareZone();
+		breakCollider.enabled = false;
 	}
 
 	public void PrepareZone()
 	{
+		float zoneHeight = zoneHeights[ChallengesHolder.Challenges.pendatUpgrade];
+
 		var screenSize = EnhancedTouchSupportRouter.Aspect;
 		divider.size = new Vector2(2 * screenSize.x, divider.size.y);
 
 		zoneLeft.transform.parent.transform.localPosition = new Vector2(2 * screenSize.x * 1f / 6f - screenSize.x, zoneLeft.transform.parent.transform.localPosition.y);
-		zoneLeft.transform.localScale = new Vector3(2f * screenSize.x / 3f, zoneLeft.transform.localScale.y, zoneLeft.transform.localScale.z);
+		zoneLeft.transform.localScale = new Vector3(2f * screenSize.x / 3f, zoneHeight, zoneLeft.transform.localScale.z);
 		var leftShape = particlesLeft.shape;
 		leftShape.radius = 2f * screenSize.x / 6f;
 
 		zoneMiddle.transform.parent.transform.localPosition = new Vector2(2 * screenSize.x * 3f / 6f - screenSize.x, zoneMiddle.transform.parent.transform.localPosition.y);
-		zoneMiddle.transform.localScale = new Vector3(2f * screenSize.x / 3f, zoneMiddle.transform.localScale.y, zoneMiddle.transform.localScale.z);
+		zoneMiddle.transform.localScale = new Vector3(2f * screenSize.x / 3f, zoneHeight, zoneMiddle.transform.localScale.z);
 		var middleShape = particlesMiddle.shape;
 		middleShape.radius = 2f * screenSize.x / 6f;
 
 		zoneRight.transform.parent.transform.localPosition = new Vector2(2 * screenSize.x * 5f / 6f - screenSize.x, zoneRight.transform.parent.transform.localPosition.y);
-		zoneRight.transform.localScale = new Vector3(2f * screenSize.x / 3f, zoneRight.transform.localScale.y, zoneRight.transform.localScale.z);
+		zoneRight.transform.localScale = new Vector3(2f * screenSize.x / 3f, zoneHeight, zoneRight.transform.localScale.z);
 		var rightShape = particlesRight.shape;
 		rightShape.radius = 2f * screenSize.x / 6f;
 
@@ -84,5 +90,13 @@ public class JumpZone : MonoBehaviour
 					break;
 				}
 		}
+	}
+
+	public void PassZone(Jumper jumper)
+	{
+		breakCollider.enabled = true;
+		var jumperPosition = jumper.transform.position;
+
+		jumperPosition.y = divider.transform.position.y * divider.size.y / 2 + jumper.spriteRenderer.size.y / 2;
 	}
 }

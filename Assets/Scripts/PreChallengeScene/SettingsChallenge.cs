@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SettingsChallenge : MonoBehaviour
@@ -32,5 +33,15 @@ public class SettingsChallenge : MonoBehaviour
 
 		soundsModel.sprite = soundsSprite;
 		musicModel.sprite = musicSprite;
+	}
+
+	public void ChallengeScene()
+	{
+		SceneManager.LoadScene("ChallengeScene");
+	}
+
+	public void ExitScene()
+	{
+		Application.Quit();
 	}
 }
