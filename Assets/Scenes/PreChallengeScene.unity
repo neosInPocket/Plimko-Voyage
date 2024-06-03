@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rewriteSaves: 0
   currentSection: 1
-  stars: 176
+  stars: 0
   ringUpgrade: 0
   pendatUpgrade: 0
   soundsPopup: 1
@@ -980,10 +980,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 60147351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.21819486, y: 0.11756393}
-  m_AnchorMax: {x: 0.7818051, y: 0.79945123}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.3247794, y: 0.11756393}
+  m_AnchorMax: {x: 0.6752206, y: 0.82720804}
+  m_AnchoredPosition: {x: 0, y: -4.5}
+  m_SizeDelta: {x: -18, y: -9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &129971527
 MonoBehaviour:
@@ -1032,7 +1032,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 161.71
+  m_fontSize: 148.45
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2168,7 +2168,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: slow down adventures
+  m_text: Plimko Voyage
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 361889cb23f8f644aaaff89c6ff3f705, type: 2}
   m_sharedMaterial: {fileID: 8111232909555991239, guid: 361889cb23f8f644aaaff89c6ff3f705, type: 2}
@@ -5446,7 +5446,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
